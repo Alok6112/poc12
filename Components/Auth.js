@@ -32,7 +32,7 @@ function Auth({navigation}) {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       setUserInfo(userInfo); // Update user info state
-      console.log(userInfo);
+      console.log("user",userInfo);
       navigation.navigate('Dashboard', user.name);
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {

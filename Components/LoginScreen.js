@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useState} from 'react';
 import {
   Alert,
+  Button,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -14,6 +15,12 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import {
+  checkApplicationNotificationPermission,
+  registerAppWithFCM,
+} from '../src/utils/fcmHelper';
+import messaging from '@react-native-firebase/messaging';
+import database from '@react-native-firebase/database';
 
 GoogleSignin.configure({
   webClientId:
@@ -58,7 +65,7 @@ const LoginScreen = ({navigation}) => {
   const handleLogin = async () => {
     const result = email.match(pattern);
 
-    console.log(result, 'checking pattern');
+    // console.log(result, 'checking pattern');
 
     if (!email || !password || !name) {
       Alert.alert('Input field are required!');
@@ -94,6 +101,33 @@ const LoginScreen = ({navigation}) => {
         console.log(err);
       }
 
+      database()
+        .ref('users')
+        .orderByChild("email")
+        .equalTo(email)
+        .once('value')
+        .then(snapshot => {
+          if (snapshot.exists()) {
+            let userData = (snapshot.val());
+            console.log(userData, "userdata");
+            
+            // Use an async IIFE to handle async operations
+            (async () => {
+              try {
+                
+                await AsyncStorage.setItem("Chatusers", JSON.stringify(userData)); // Ensure userData is a string
+                const data = await AsyncStorage.getItem("Chatusers");
+                console.log(JSON.parse(data), "userdata1"); // Parse the string back to an object
+                console.log("snap");
+              } catch (error) {
+                console.error("AsyncStorage error: ", error);
+              }
+            })();
+          } else {
+            console.log("No data available");
+          }
+        })
+
       // if(email ==="Dummy@mail.com" && password==="dummy"){
       //     Alert.alert('Login Successful!','',[{text: 'OK', onPress: () => {navigation.navigate('Dashboard',{name})}},])
       //     StoreData()
@@ -109,9 +143,9 @@ const LoginScreen = ({navigation}) => {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       setUserInfo(userInfo); // Update user info state
-      console.log(userInfo, "navigate");
-        console.log(userInfo.user.name);
-        navigation.navigate('Dashboard', userInfo.user.name );
+      console.log(userInfo, 'navigate');
+      console.log(userInfo.user.name);
+      navigation.navigate('Dashboard', userInfo.user.name);
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -124,6 +158,11 @@ const LoginScreen = ({navigation}) => {
       }
     }
   };
+
+  const handleNavigateToRegister = () => {
+    navigation.navigate('Register');
+  };
+
   return (
     <SafeAreaView>
       <View style={styles.view}>
@@ -156,7 +195,7 @@ const LoginScreen = ({navigation}) => {
         <Text>Login</Text>
       </TouchableOpacity>
 
-      <View style={styles.container}>
+      {/* <View style={styles.container}>
         <Text style={styles.heading}>Push Notification</Text>
         <GoogleSigninButton
           style={styles.googleSignInButton}
@@ -164,7 +203,12 @@ const LoginScreen = ({navigation}) => {
           color={GoogleSigninButton.Color.Light}
           onPress={signIn}
         />
-      </View>
+      </View> */}
+
+      <View style={styles.btn}>
+      <Button title="Go to Register" onPress={handleNavigateToRegister} />
+    </View>
+
     </SafeAreaView>
   );
 };
@@ -199,7 +243,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    marginTop:15
+    marginTop: 15,
   },
   heading: {
     fontSize: 24,
@@ -210,4 +254,7 @@ const styles = StyleSheet.create({
     height: 48,
     marginTop: 20,
   },
+  btn:{
+    marginTop:50
+  }
 });

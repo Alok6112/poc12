@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { View,Text, TextInput, Button, TouchableOpacity, FlatList, SafeAreaView, Switch, StyleSheet, SectionList, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Products } from "./Components/Products";
+import { getFcmToken, registerListenerWithFCM } from "./src/utils/fcmHelper";
+import { NativeBaseConfigProvider } from 'native-base';
+
  const App = () =>{
     const [value,setValue]=useState("")
     const [todoArray,setTodoArray]=useState([])
@@ -19,6 +22,8 @@ import { Products } from "./Components/Products";
         setValue(e)
 
     }
+
+   
     const onPressSubmit = () =>{
         // let value={item:value,id:Math.random()}
         setTodoArray([...todoArray,value])
@@ -81,6 +86,7 @@ import { Products } from "./Components/Products";
     // {console.log(movies)}
 
     return (
+
         <SafeAreaView>
            
         <View >
@@ -144,6 +150,7 @@ import { Products } from "./Components/Products";
     }
        </View>
         </SafeAreaView>
+
     )
 }
 export default App

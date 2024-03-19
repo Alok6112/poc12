@@ -10,11 +10,13 @@ import CameraScreenPage from './CameraScreen';
 import ScoreCardScreen from './ScoreCardScreen';
 import RegisterScreen from './RegisterScreen';
 import { Products } from './Products';
+import ChatScreen from './ChatScreen';
+import AllUser from './AllUser';
 
 const Stack = createNativeStackNavigator()
 
 const NavigationApp = ()=>{
-
+    
    return (
     <NavigationContainer >
     <Stack.Navigator initialRouteName='Splash' >
@@ -56,6 +58,9 @@ const NavigationApp = ()=>{
        
         >
         </Stack.Screen>
+   <Stack.Screen name="Chat" component={ChatScreen} />
+   <Stack.Screen name="AllUser" component={AllUser} />
+
     </Stack.Navigator>
 
 </NavigationContainer>
